@@ -16,7 +16,10 @@ namespace volume_ctrl
 {
     class VolumeCrtlPage : public base_page::BasePage
     {
-        public:
+        private:
+            double last_drawn_volume = -1;
+
+            public:
             VolumeCrtlPage() = default;
 
             void draw_new() override;

@@ -36,11 +36,14 @@ void pages::update_page()
 
 void pages::set_page(size_t page)
 {
-    _current_page = page;
+    if (_current_page != page)
+    {
+        _current_page = page;
 
-    // call current page's draw_new
-    display::disp.cls();
-    pages[_current_page]->draw_new();
+        // call current page's draw_new
+        display::disp.cls();
+        pages[_current_page]->draw_new();
+    }
 }
 
 

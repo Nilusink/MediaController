@@ -59,7 +59,7 @@ int text_width(const char* str, int textSize)
     return strlen(str) * 6 * textSize;
 }
 
-static inline uint16_t rgbTo565(uint8_t r, uint8_t g, uint8_t b)
+uint16_t display::rgbTo565(uint8_t r, uint8_t g, uint8_t b)
 {
     return ((r & 0xF8) << 8) |
            ((g & 0xFC) << 3) |
@@ -172,7 +172,7 @@ _Display::_Display()
     display.setSPISpeed(SPI_FREQUENCY);  // 40 MHz
 
     // screen orientation
-    display.setRotation(2);
+    display.setRotation(1);
 
     // fill screen with black
     display.fillScreen(GC9A01A_BLACK);
@@ -426,7 +426,7 @@ void _Display::draw_arc(
     if (inner < 0) inner = 0;
 
     // step controls smoothness vs speed
-    float step = .005f;
+    float step = .004f;
 
     for (float a = start_deg; a <= end_deg; a += step)
     {

@@ -75,7 +75,9 @@ void process_message(const String& msg)
 
             // confirm OK
             Serial.println("OK");
-        } else {
+        }
+        else
+        {
             Serial.println("FAIL");
         }
     }
@@ -122,10 +124,43 @@ void process_message(const String& msg)
         // send ACK
         Serial.println("OK");
     }
+    else if (msg.startsWith("VOL<|>"))
+    {
+        // set volume
+        sep_0 = msg.indexOf(SEP);
+
+        if (sep_0 != -1)
+        {
+            // convert msg to float
+            String volume = msg.substring(sep_0 + SEP_LEN);
+            data::v_data.volume = volume.toFloat();
+
+            // confirm OK
+            Serial.println("OK");
+
+            // change page
+            pages::set_page(VOLUME_CTRL_PAGE);
+            last_input = millis();
+        }
+        else
+        {
+            Serial.println("FAIL");
+        }
+
+    }
     else
     {
         Serial.print("FAIL, "); Serial.println(msg);
     }
+}
+
+
+void send_volume()
+{
+    char buff[16];
+    snprintf(buff, 16, "VOL%s%d", SEP, (uint8_t)data::v_data.volume);
+
+    Serial.println(buff);
 }
 
 
@@ -167,8 +202,27 @@ void loop() {
         last_input = now;
 
         // get data
-        data::v_data.volume += encoder::encoder.getCount() * 2.5;
+        double count = encoder::encoder.getCount() * 2.5;
         encoder::encoder.clearCount();
+
+        if (!(count > 0 && data::v_data.volume >= 100) && !(count < 0 && data::v_data.volume <= 0))
+        {
+            //  when close to 100 or 0, clamp count
+            if (data::v_data.volume + count > 100)
+            {
+                count = 100 - data::v_data.volume;
+            }
+            else if (data::v_data.volume + count < 0)
+            {
+                count = 0 - data::v_data.volume;
+            }
+
+            data::v_data.volume += count;
+            data::v_data.delta = count;
+
+            // update pc volume
+            send_volume();
+        }
 
         // set page
         pages::set_page(VOLUME_CTRL_PAGE);

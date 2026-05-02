@@ -37,6 +37,7 @@ namespace data
     struct _VolumeData
     {
         float volume = 50;
+        float delta = 0;
     };
 
     // instances

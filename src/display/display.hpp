@@ -28,6 +28,7 @@
 namespace display
 {
     uint16_t average565(uint16_t a, uint16_t b, uint16_t c, uint16_t d);
+    uint16_t rgbTo565(uint8_t r, uint8_t g, uint8_t b);
 
     class _Display
     {
