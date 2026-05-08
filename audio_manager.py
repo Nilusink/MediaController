@@ -1,5 +1,6 @@
 from pycaw.pycaw import AudioUtilities
 import typing as tp
+import keyboard
 
 
 class AudioManager:
@@ -28,6 +29,7 @@ class AudioManager:
         speakers = AudioUtilities.GetSpeakers()
         
         if speakers:
+            self._volume = volume
             speakers.EndpointVolume.SetMasterVolumeLevelScalar(volume, None)
             return True
         
@@ -43,8 +45,20 @@ class AudioManager:
             vol = speakers.EndpointVolume.GetMasterVolumeLevelScalar()
 
             # update callback
-            if vol != self._volume:
+            if round(vol * 100, 0) != round(self._volume * 100, 0):
                 if self._change_volume_callback:
                     self._change_volume_callback(vol)
             
             self._volume = vol
+
+    def toggle_pause(self) -> None:
+        """pause / unpause media"""
+        keyboard.send("play/pause media")
+
+    def skip(self) -> None:
+        """skip track"""
+        keyboard.send("next track")
+    
+    def skip_prev(self) -> None:
+        """go to previous track"""
+        keyboard.send("previous track")

@@ -163,6 +163,21 @@ void send_volume()
     Serial.println(buff);
 }
 
+void send_toggle_prev()
+{
+    Serial.println("PRE");
+}
+
+void send_toggle_play()
+{
+    Serial.println("PLY");
+}
+
+void send_toggle_skip()
+{
+    Serial.println("SKP");
+}
+
 
 void setup()
 {
@@ -172,6 +187,11 @@ void setup()
     // setup stuff
     buttons::setup();
     encoder::setup();
+
+    // set button callbacks
+    buttons::next_b->set_callback(&send_toggle_prev);
+    buttons::pause_b->set_callback(&send_toggle_play);
+    buttons::skip_b->set_callback(&send_toggle_skip);
 }
 
 

@@ -99,6 +99,9 @@ def get_thumb_thread(q: Queue):
         
         # transmit results to main thread
         q.put(res)
+        
+        # wait 1 sec, don't spam media controller
+        time.sleep(1)
 
 
 def main():
@@ -107,11 +110,15 @@ def main():
     comm = ESPComm(am)
 
     pos = -1
+    status = -1
     
     results_queue = Queue()
 
     # start thumbnail thread
     Thread(target=get_thumb_thread, args=(results_queue,)).start()
+    
+    # reset new device
+    comm.new_device = False
     
     last_title = ""
     try:
@@ -121,13 +128,17 @@ def main():
                 res = results_queue.get()
 
                 if res:
-                    thumbnail, artist, title, a_title, new_pos, dur, status = res
+                    thumbnail, artist, title, a_title, new_pos, dur, new_status = res
 
-                    if new_pos != pos:
+                    if new_pos != pos or status != new_status:
                         pos = new_pos
-                        comm.update_progress(pos, dur, status)
-            
-                    if title != last_title:
+                        status = new_status
+
+                        comm.update_progress(pos, dur, new_status)
+                                    
+                    if title != last_title:  # or comm.new_device:
+                        comm.new_device = False
+
                         last_title = title
 
                         # draw info first
@@ -153,6 +164,7 @@ def main():
         print("closing...")
     
     finally:
+        print("prog done?")
         running = False
 
 

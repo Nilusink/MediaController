@@ -23,6 +23,7 @@ def rgb888_to_565(r, g, b):
 class ESPComm:
     _sep = "<|>"
     debug = False
+    new_device = False
     
     def __init__(self, am: AudioManager, baud: int = BAUD):
         self._am: AudioManager = am
@@ -39,12 +40,19 @@ class ESPComm:
         for p in serial.tools.list_ports.comports():
             if "CH343" in p.description:
                 try:
+                    if self.debug:
+                        print(f"trying: {p.device}, {p.description}")
+    
                     ser = serial.Serial(p.device, self._baud, timeout=1)
                     ser.set_buffer_size(rx_size=65536, tx_size=65536)
                     
                     print(f"selected serial device: {p.device}, {p.description}")
+                    self.new_device = True
                 
                 except serial.SerialException:
+                    if self.debug:
+                        print("failed")
+    
                     continue
 
         return ser
@@ -101,6 +109,15 @@ class ESPComm:
             if split != -1:
                 vol = int(msg[split+len(self._sep):]) / 100
                 self._am.set_volume(vol)
+        
+        elif msg.startswith("PRE"):
+            self._am.skip_prev()
+        
+        elif msg.startswith("PLY"):
+            self._am.toggle_pause()
+        
+        elif msg.startswith("SKP"):
+            self._am.skip()
 
     def _receive_confirm(self) -> bool:
         """try to receive confirm message"""

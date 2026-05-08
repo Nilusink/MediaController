@@ -262,7 +262,7 @@ void _Display::auto_text(
                 strncpy(buff, &str[max_chars*split], len);
                 buff[len] = '\0';
 
-                x_pos = (TFT_WIDTH - len) / 2;
+                x_pos = (TFT_WIDTH - text_width(&str[max_chars*split], start_size)) / 2;
             }
 
             // set cursor centered around y_pos

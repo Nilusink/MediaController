@@ -18,7 +18,8 @@ namespace buttons
     {
         private:
             uint8_t _pin;
-            bool _inverted, _value;
+            bool _inverted, _value, _callback_active = false;
+            void (*_callback)() = nullptr;
 
             // debounce stuff
             uint16_t _debounce_time = 20;  // 20 ms
@@ -26,7 +27,15 @@ namespace buttons
             unsigned long _last_on;
         
         public:
-        Button(uint8_t pin, bool inverted = true);
+        Button(uint8_t pin, bool inverted = false);
+
+        /**
+         * @brief add a button press callback
+         * 
+         * @param callback function pointer
+         */
+        void set_callback(void (*callback)());
+        void delete_callback();
 
         /**
          * @brief Set the time the button needs to be one specific value
